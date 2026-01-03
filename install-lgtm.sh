@@ -52,4 +52,24 @@ docker compose -f "${APP_DIR}/compose.yaml" pull
 echo "===> Starting stack (up -d)"
 docker compose -f "${APP_DIR}/compose.yaml" up -d
 
-echo "===> Done. Logs: docker compose -f ${APP_DIR}/compose.yaml logs -f"
+echo "===> Cleaning up installation files"
+rm -f "${SCRIPT_DIR}/compose.yaml" 2>/dev/null || true
+rm -f "${SCRIPT_DIR}/readme.md" 2>/dev/null || true
+rm -f "${SCRIPT_DIR}/README.md" 2>/dev/null || true
+
+echo "===> Navigating to ${APP_DIR}"
+cd "${APP_DIR}"
+echo ""
+echo "===> Contents of ${APP_DIR}:"
+ls -la
+
+echo ""
+echo "===> Stack status:"
+docker compose -f "${APP_DIR}/compose.yaml" ps
+
+echo ""
+echo "===> Done! You are now in ${APP_DIR}"
+echo "===> Logs: docker compose -f ${APP_DIR}/compose.yaml logs -f"
+
+# Self-delete (must be last)
+rm -f "${SCRIPT_DIR}/install-lgtm.sh" 2>/dev/null || true
