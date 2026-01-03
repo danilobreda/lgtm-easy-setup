@@ -67,12 +67,6 @@ docker compose -f "${APP_DIR}/compose.yaml" pull
 echo "===> Starting stack (up -d)"
 docker compose -f "${APP_DIR}/compose.yaml" up -d
 
-echo "===> Cleaning up installation files"
-rm -f "${SCRIPT_DIR}/compose.yaml" 2>/dev/null || true
-rm -f "${SCRIPT_DIR}/readme.md" 2>/dev/null || true
-rm -f "${SCRIPT_DIR}/README.md" 2>/dev/null || true
-rm -f "${SCRIPT_DIR}/install-lgtm.sh" 2>/dev/null || true
-
 echo ""
 echo "============================================"
 echo "===> Installation complete!"
