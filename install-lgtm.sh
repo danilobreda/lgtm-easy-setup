@@ -93,11 +93,10 @@ docker compose -f "${APP_DIR}/compose.yaml" ps
 
 echo "To go to the application directory, run:"
 echo "  cd ${APP_DIR}"
-echo ""
-echo "Useful commands:"
-echo "  Logs:    docker compose -f ${APP_DIR}/compose.yaml logs -f"
-echo "  Stop:    docker compose -f ${APP_DIR}/compose.yaml down"
-echo "  Restart: docker compose -f ${APP_DIR}/compose.yaml restart"
+echo "Useful commands on folder ${APP_DIR}:"
+echo "  Logs:    docker compose logs -f"
+echo "  Stop:    docker compose down"
+echo "  Restart: docker compose restart"
 echo ""
 
 # Remove the installation directory (must be last)
