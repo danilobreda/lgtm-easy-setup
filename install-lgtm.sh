@@ -6,18 +6,18 @@ REPO_URL="https://github.com/grafana/docker-otel-lgtm.git"
 DATA_ROOT="/data/otel-lgtm"
 SCRIPT_DIR="$(cd -- "$(dirname "$0")" && pwd)"
 
-# Check Ubuntu 22.04
+# Check Ubuntu (any version)
 echo "===> Checking OS compatibility"
 if [ -f /etc/os-release ]; then
   . /etc/os-release
-  if [ "$ID" != "ubuntu" ] || [[ "$VERSION_ID" != "22.04"* ]]; then
-    echo "ERROR: This script only supports Ubuntu 22.04 LTS"
+  if [ "$ID" != "ubuntu" ]; then
+    echo "ERROR: This script only supports Ubuntu"
     echo "Detected: $ID $VERSION_ID"
     exit 1
   fi
   echo "OK: Ubuntu $VERSION_ID detected"
 else
-  echo "ERROR: Cannot detect OS. This script only supports Ubuntu 22.04 LTS"
+  echo "ERROR: Cannot detect OS. This script only supports Ubuntu"
   exit 1
 fi
 
