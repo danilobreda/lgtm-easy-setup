@@ -74,18 +74,23 @@ rm -f "${SCRIPT_DIR}/README.md" 2>/dev/null || true
 rm -f "${SCRIPT_DIR}/install-lgtm.sh" 2>/dev/null || true
 
 echo ""
+echo "============================================"
+echo "===> Installation complete!"
+echo "============================================"
+echo ""
+
+echo ""
 echo "===> Contents of ${APP_DIR}:"
 ls -la "${APP_DIR}"
+
+echo ""
+echo "===> Contents of ${DATA_ROOT}:"
+ls -la "${DATA_ROOT}"
 
 echo ""
 echo "===> Stack status:"
 docker compose -f "${APP_DIR}/compose.yaml" ps
 
-echo ""
-echo "============================================"
-echo "===> Installation complete!"
-echo "============================================"
-echo ""
 echo "To go to the application directory, run:"
 echo "  cd ${APP_DIR}"
 echo ""
