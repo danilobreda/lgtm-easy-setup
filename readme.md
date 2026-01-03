@@ -1,8 +1,6 @@
 # lgtm-easy-setup
 
-One-command setup for the LGTM observability stack (Loki, Grafana, Tempo, Mimir).
-
-Instalação do stack LGTM de observabilidade com um único comando.
+, Mimir) using the grafana/otel-lgtm:latest image with persistent data storage.
 
 ## 📖 Documentation / Documentação
 
@@ -28,12 +26,6 @@ chmod +x install-lgtm.sh
 |----------------|-------------------------|
 | `/data/otel-lgtm` | Persistent data / Dados persistentes |
 | `/opt/otel-lgtm` | Application files / Arquivos da aplicação |
-
-## License / Licença
-
-MIT
-
----
 
 ## License / Licença
 

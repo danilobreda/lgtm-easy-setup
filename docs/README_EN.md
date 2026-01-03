@@ -1,11 +1,5 @@
 # lgtm-easy-setup - English Documentation
 
-Idempotent script to deploy the LGTM stack (Loki, Grafana, Tempo, Mimir) using the `grafana/otel-lgtm:latest` image with persistent data storage.
-
-## ⚠️ Requirements
-
-- **Ubuntu 22.04 LTS** (only supported OS at this time)
-
 ## Quick Start
 
 ```bash

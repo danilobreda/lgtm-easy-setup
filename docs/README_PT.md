@@ -1,11 +1,5 @@
 # lgtm-easy-setup - Documentação em Português
 
-Script idempotente para subir o stack LGTM (Loki, Grafana, Tempo, Mimir) usando a imagem `grafana/otel-lgtm:latest` com armazenamento persistente de dados.
-
-## ⚠️ Requisitos
-
-- **Ubuntu 22.04 LTS** (único sistema operacional suportado no momento)
-
 ## Uso Rápido
 
 ```bash
