@@ -8,6 +8,8 @@
 
 Idempotent script to deploy the LGTM stack (Loki, Grafana, Tempo, Mimir) using the `grafana/otel-lgtm:latest` image with persistent data storage.
 
+UBUNTU only at this version.
+
 ### Quick Start
 
 ```bash
