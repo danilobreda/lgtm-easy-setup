@@ -1,6 +1,6 @@
 # lgtm-easy-setup
 
-, Mimir) using the grafana/otel-lgtm:latest image with persistent data storage.
+Script to deploy the LGTM stack (Loki, Grafana, Tempo, Mimir) using the grafana/otel-lgtm:latest image with persistent data storage
 
 ## 📖 Documentation / Documentação
 
