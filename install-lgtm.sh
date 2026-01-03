@@ -6,6 +6,21 @@ REPO_URL="https://github.com/grafana/docker-otel-lgtm.git"
 DATA_ROOT="/data/otel-lgtm"
 SCRIPT_DIR="$(cd -- "$(dirname "$0")" && pwd)"
 
+# Check Ubuntu 22.04
+echo "===> Checking OS compatibility"
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  if [ "$ID" != "ubuntu" ] || [[ "$VERSION_ID" != "22.04"* ]]; then
+    echo "ERROR: This script only supports Ubuntu 22.04 LTS"
+    echo "Detected: $ID $VERSION_ID"
+    exit 1
+  fi
+  echo "OK: Ubuntu $VERSION_ID detected"
+else
+  echo "ERROR: Cannot detect OS. This script only supports Ubuntu 22.04 LTS"
+  exit 1
+fi
+
 echo "===> Updating system"
 sudo apt update -y
 sudo apt upgrade -y
@@ -56,20 +71,30 @@ echo "===> Cleaning up installation files"
 rm -f "${SCRIPT_DIR}/compose.yaml" 2>/dev/null || true
 rm -f "${SCRIPT_DIR}/readme.md" 2>/dev/null || true
 rm -f "${SCRIPT_DIR}/README.md" 2>/dev/null || true
+rm -f "${SCRIPT_DIR}/install-lgtm.sh" 2>/dev/null || true
 
-echo "===> Navigating to ${APP_DIR}"
-cd "${APP_DIR}"
 echo ""
 echo "===> Contents of ${APP_DIR}:"
-ls -la
+ls -la "${APP_DIR}"
 
 echo ""
 echo "===> Stack status:"
 docker compose -f "${APP_DIR}/compose.yaml" ps
 
 echo ""
-echo "===> Done! You are now in ${APP_DIR}"
-echo "===> Logs: docker compose -f ${APP_DIR}/compose.yaml logs -f"
+echo "============================================"
+echo "===> Installation complete!"
+echo "============================================"
+echo ""
+echo "To go to the application directory, run:"
+echo "  cd ${APP_DIR}"
+echo ""
+echo "Useful commands:"
+echo "  Logs:    docker compose -f ${APP_DIR}/compose.yaml logs -f"
+echo "  Stop:    docker compose -f ${APP_DIR}/compose.yaml down"
+echo "  Restart: docker compose -f ${APP_DIR}/compose.yaml restart"
+echo ""
 
-# Self-delete (must be last)
-rm -f "${SCRIPT_DIR}/install-lgtm.sh" 2>/dev/null || true
+# Remove the installation directory (must be last)
+cd /
+rm -rf "${SCRIPT_DIR}" 2>/dev/null || true
