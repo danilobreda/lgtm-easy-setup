@@ -16,7 +16,8 @@ chmod +x install-lgtm.sh
 - Adds your user to the `docker` group
 - Creates `/opt/otel-lgtm` directory and optionally clones/updates the upstream repo
 - Creates `/data/otel-lgtm` (persistence) with `chown 472:472` (typical Grafana image UID)
-- Copies `compose.yaml` to `/opt/otel-lgtm` and runs `docker compose pull && up -d`
+- Runs `update-lgtm.sh`, which **generates** `compose.yaml` + retention configs in `/opt/otel-lgtm` and runs `docker compose pull && up -d`
+- Leaves a copy of `update-lgtm.sh` in `/opt/otel-lgtm` for future updates
 - **Self-cleans:** removes the cloned directory after installation
 - Shows `ls -la` and `docker compose ps` to confirm installation
 
@@ -43,16 +44,16 @@ The container is configured with `restart: unless-stopped`, which means:
 
 ## 🗑️ Data Retention (automatic cleanup)
 
-The `grafana/otel-lgtm` image **ships with no retention configured for Loki** (logs grow forever and fill the disk). This project mounts custom configs into the container to enable automatic cleanup:
+The `grafana/otel-lgtm` image **ships with no retention configured for Loki** (logs grow forever and fill the disk). `update-lgtm.sh` generates custom configs that are mounted into the container to enable automatic cleanup:
 
-| Signal | Component | Retention | Where it's configured |
-|--------|-----------|-----------|-----------------------|
+| Signal | Component | Retention | Generated file |
+|--------|-----------|-----------|----------------|
 | Logs | Loki | **30 days** | `loki-config.yaml` (`retention_period` + compactor) |
 | Traces | Tempo | **15 days** | `tempo-config.yaml` (`block_retention: 360h`) |
 | Metrics | Prometheus | **30 days** | `compose.yaml` (`PROMETHEUS_EXTRA_ARGS=--storage.tsdb.retention.time=30d`) |
 | Container's own logs | Docker | max ~150 MB | `compose.yaml` (`logging: max-size: 50m, max-file: 3`) |
 
-> 💡 To change the retention window, edit the values above and run `docker compose -f /opt/otel-lgtm/compose.yaml up -d --force-recreate`.
+> 💡 To change the retention window, edit the `LOKI_RETENTION`, `TEMPO_RETENTION` and `PROMETHEUS_RETENTION` variables at the top of `update-lgtm.sh` and run it again.
 
 > ℹ️ Loki deletion is not instant: the compactor marks old data and deletes it after `retention_delete_delay` (2h). Disk space is freed gradually.
 
@@ -60,24 +61,17 @@ The `grafana/otel-lgtm` image **ships with no retention configured for Loki** (l
 
 ## 🔄 How to Update
 
-To update to the latest version of the LGTM image (and apply the retention configs):
+`update-lgtm.sh` regenerates all configs, pulls the latest image and recreates the container — **without losing your data**. Run it straight from the internet (no cloning needed, uses no disk space):
 
 ```bash
-# 1. Get the latest version of this repository
-git clone https://github.com/danilobreda/lgtm-easy-setup.git /tmp/lgtm-easy-setup
-
-# 2. Copy the compose file and retention configs into the app directory
-cp /tmp/lgtm-easy-setup/compose.yaml /opt/otel-lgtm/compose.yaml
-cp /tmp/lgtm-easy-setup/loki-config.yaml /opt/otel-lgtm/loki-config.yaml
-cp /tmp/lgtm-easy-setup/tempo-config.yaml /opt/otel-lgtm/tempo-config.yaml
-rm -rf /tmp/lgtm-easy-setup
-
-# 3. Pull the latest image and recreate the container
-docker compose -f /opt/otel-lgtm/compose.yaml pull
-docker compose -f /opt/otel-lgtm/compose.yaml up -d --force-recreate
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
 ```
 
-> 💡 The update process will pull the latest image and recreate the container if needed, **without losing your data**.
+Or, if you installed before, a copy is kept on the server:
+
+```bash
+bash /opt/otel-lgtm/update-lgtm.sh
+```
 
 ### Disk full? Quick diagnosis
 
@@ -89,12 +83,12 @@ sudo du -sh /data/otel-lgtm/*
 sudo du -sh /var/lib/docker/containers/*
 ```
 
-If `/data/otel-lgtm/loki` is the culprit, after applying the update above the compactor will automatically clean everything older than 30 days (allow a few hours). **Emergency** (if the disk is 100% full and you accept losing old logs):
+If `/data/otel-lgtm/loki` is the culprit, after running `update-lgtm.sh` the compactor will automatically clean everything older than 30 days (allow a few hours — deletion is gradual).
+
+**Emergency** (disk 100% full and you accept losing old logs — traces, metrics and dashboards stay intact):
 
 ```bash
-docker compose -f /opt/otel-lgtm/compose.yaml down
-sudo rm -rf /data/otel-lgtm/loki   # deletes ALL logs (traces/metrics/dashboards stay intact)
-docker compose -f /opt/otel-lgtm/compose.yaml up -d
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash -s -- --purge-loki
 ```
 
 ## Exposed Ports

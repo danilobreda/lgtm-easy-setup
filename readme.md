@@ -20,6 +20,20 @@ chmod +x install-lgtm.sh
 ./install-lgtm.sh
 ```
 
+## 🔄 Quick Update / Atualização Rápida
+
+Updates the stack and applies retention configs, without losing data / Atualiza a stack e aplica as configs de retenção, sem perder dados:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+```
+
+Disk 100% full? Purges all stored logs (traces/metrics/dashboards stay intact) / Disco 100% cheio? Apaga todos os logs armazenados (traces/métricas/dashboards ficam intactos):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash -s -- --purge-loki
+```
+
 ## 📁 Where is my data? / Onde ficam meus dados?
 
 | Path / Caminho | Description / Descrição |

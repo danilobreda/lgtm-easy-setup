@@ -57,17 +57,11 @@ sudo mkdir -p "$DATA_ROOT"
 # UID 472 é usado pelo usuário 'grafana' (ajuste se necessário no seu host)
 sudo chown -R 472:472 "$DATA_ROOT" || true
 
-echo "===> Installing compose.yaml and retention configs into ${APP_DIR}"
-cp "${SCRIPT_DIR}/compose.yaml" "${APP_DIR}/compose.yaml"
-cp "${SCRIPT_DIR}/loki-config.yaml" "${APP_DIR}/loki-config.yaml"
-cp "${SCRIPT_DIR}/tempo-config.yaml" "${APP_DIR}/tempo-config.yaml"
-sudo chown "$USER:$USER" "${APP_DIR}/compose.yaml" "${APP_DIR}/loki-config.yaml" "${APP_DIR}/tempo-config.yaml"
-
-echo "===> Pulling images"
-docker compose -f "${APP_DIR}/compose.yaml" pull
-
-echo "===> Starting stack (up -d)"
-docker compose -f "${APP_DIR}/compose.yaml" up -d
+echo "===> Generating configs and starting the stack (via update-lgtm.sh)"
+# update-lgtm.sh generates compose.yaml + retention configs in ${APP_DIR},
+# pulls the latest image and starts the stack. It also copies itself to
+# ${APP_DIR}/update-lgtm.sh for future updates.
+bash "${SCRIPT_DIR}/update-lgtm.sh"
 
 echo ""
 echo "============================================"
