@@ -9,5 +9,17 @@ services:
       - "4318:4318"  # OTLP HTTP
     volumes:
       - /data/otel-lgtm:/data
+      # Custom configs with data retention (upstream defaults have none for Loki)
+      - ./loki-config.yaml:/otel-lgtm/loki-config.yaml:ro   # logs: 30 days
+      - ./tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro # traces: 15 days
     environment:
       - ENABLE_LOGS_ALL=true
+      # Metrics retention: 30 days (upstream default is 15d)
+      - PROMETHEUS_EXTRA_ARGS=--storage.tsdb.retention.time=30d
+    # Cap the container's own stdout log file (unbounded by default and
+    # ENABLE_LOGS_ALL=true makes it grow fast)
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"

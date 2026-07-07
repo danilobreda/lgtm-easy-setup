@@ -57,9 +57,11 @@ sudo mkdir -p "$DATA_ROOT"
 # UID 472 é usado pelo usuário 'grafana' (ajuste se necessário no seu host)
 sudo chown -R 472:472 "$DATA_ROOT" || true
 
-echo "===> Installing compose.yaml into ${APP_DIR}"
+echo "===> Installing compose.yaml and retention configs into ${APP_DIR}"
 cp "${SCRIPT_DIR}/compose.yaml" "${APP_DIR}/compose.yaml"
-sudo chown "$USER:$USER" "${APP_DIR}/compose.yaml"
+cp "${SCRIPT_DIR}/loki-config.yaml" "${APP_DIR}/loki-config.yaml"
+cp "${SCRIPT_DIR}/tempo-config.yaml" "${APP_DIR}/tempo-config.yaml"
+sudo chown "$USER:$USER" "${APP_DIR}/compose.yaml" "${APP_DIR}/loki-config.yaml" "${APP_DIR}/tempo-config.yaml"
 
 echo "===> Pulling images"
 docker compose -f "${APP_DIR}/compose.yaml" pull
