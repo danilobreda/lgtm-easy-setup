@@ -61,7 +61,13 @@ A imagem `grafana/otel-lgtm` **não vem com retenção configurada para o Loki**
 
 ## 🔄 Como Atualizar
 
-O `update-lgtm.sh` regenera todas as configs, baixa a imagem mais recente e recria o container — **sem perder seus dados**. Rode direto da internet (não precisa clonar nada, nem ocupa disco):
+O `update-lgtm.sh` regenera todas as configs, baixa a imagem mais recente e recria o container — **sem perder seus dados**. Ele também:
+
+- **Cria uma swap de 4 GB** em `/swapfile` se o servidor não tiver nenhuma. Sem swap, um pico de memória faz o kernel matar o Prometheus e as métricas param sem aviso. Só cria se sobrarem 5 GB livres no disco. Para mudar o tamanho ou desligar (`0`), edite `SWAP_SIZE_GB` no topo do script.
+- **Faz backup do Grafana** (`/data/otel-lgtm/grafana` → `/data/otel-lgtm/grafana.bak`) quando a versão da imagem muda. O Grafana novo migra o banco e não volta para a versão antiga sem essa cópia.
+- **Espera até 5 min a stack ficar `healthy`.** Se não ficar, mostra o erro, sai com código 1 e imprime os comandos para voltar à versão anterior.
+
+Rode direto da internet (não precisa clonar nada, nem ocupa disco):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash

@@ -22,7 +22,7 @@ chmod +x install-lgtm.sh
 
 ## 🔄 Quick Update / Atualização Rápida
 
-Updates the stack and applies retention configs, without losing data / Atualiza a stack e aplica as configs de retenção, sem perder dados:
+Updates the stack and applies retention configs, without losing data. It also creates a 4 GB swap file if the host has none, backs up Grafana before a version change and waits until the stack is healthy / Atualiza a stack e aplica as configs de retenção, sem perder dados. Também cria uma swap de 4 GB se o servidor não tiver, faz backup do Grafana antes de trocar de versão e espera a stack ficar saudável:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
