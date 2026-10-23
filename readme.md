@@ -25,8 +25,11 @@ chmod +x install-lgtm.sh
 Updates the stack and applies retention configs, without losing data. It also creates a 4 GB swap file if the host has none, backs up Grafana before a version change and waits until the stack is healthy / Atualiza a stack e aplica as configs de retenção, sem perder dados. Também cria uma swap de 4 GB se o servidor não tiver, faz backup do Grafana antes de trocar de versão e espera a stack ficar saudável:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh -o /tmp/update-lgtm.sh
+bash /tmp/update-lgtm.sh
 ```
+
+Step by step, with checks and what to expect / Passo a passo, com conferências e o que esperar: [English](docs/README_EN.md#-how-to-update) · [Português](docs/README_PT.md#-como-atualizar)
 
 Disk 100% full? Purges all stored logs (traces/metrics/dashboards stay intact) / Disco 100% cheio? Apaga todos os logs armazenados (traces/métricas/dashboards ficam intactos):
 

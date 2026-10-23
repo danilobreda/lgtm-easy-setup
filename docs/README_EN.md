@@ -67,17 +67,43 @@ The `grafana/otel-lgtm` image **ships with no retention configured for Loki** (l
 - **Backs up Grafana** (`/data/otel-lgtm/grafana` → `/data/otel-lgtm/grafana.bak`) when the image version changes. A newer Grafana migrates its database and can't go back to the old version without this copy.
 - **Waits up to 5 min for the stack to become `healthy`.** If it doesn't, it shows the error, exits with code 1 and prints the commands to roll back to the previous version.
 
-Run it straight from the internet (no cloning needed, uses no disk space):
+### Step by step
+
+> 💡 If you have a staging environment, update it first.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+# 1. Check the current setup
+grep -n '/data' /opt/otel-lgtm/compose.yaml     # expected: /data/otel-lgtm:/data
+docker ps --format '{{.Names}} | {{.Image}}'    # expected: otel-lgtm | grafana/otel-lgtm:latest
+
+# 2. Download the latest version of the script
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh -o /tmp/update-lgtm.sh
+
+# 3. Run it
+bash /tmp/update-lgtm.sh
 ```
 
-Or, if you installed before, a copy is kept on the server:
+- **Step 1:** the script always uses `/data/otel-lgtm` for data and the `otel-lgtm` container. If either is different on the server, don't run it: the stack would start with an empty folder, or the old container would keep holding the ports.
+- **Step 2:** always download it from GitHub. The copy at `/opt/otel-lgtm/update-lgtm.sh` is from the last update and may be outdated. When run from a file, the script also refreshes that copy.
 
-```bash
-bash /opt/otel-lgtm/update-lgtm.sh
-```
+**What to expect in the output:**
+
+| Line | Meaning |
+|------|---------|
+| `Swap enabled` / `Swap already active` | Swap created now / already there |
+| `New image version: backing up Grafana data...` | Only shown when there is a new image version |
+| `Waiting for the stack to become healthy` | Takes 1 to 3 minutes |
+| `Update complete!` | Success |
+
+After a new version, Grafana keeps updating plugins in the background for 2–3 minutes. Some panels may show errors during that time.
+
+**If you see `ERROR`:** the script shows the cause (a log excerpt) and, if the version changed, the commands to roll back to the previous one. The rollback restores Grafana from `grafana.bak`, so dashboards created after the update are lost.
+
+> ℹ️ You can also run it straight from the internet without writing anything to disk (useful when the disk is 100% full). In this mode the script can't refresh the copy at `/opt/otel-lgtm`.
+>
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+> ```
 
 ### Disk full? Quick diagnosis
 

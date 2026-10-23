@@ -67,17 +67,43 @@ O `update-lgtm.sh` regenera todas as configs, baixa a imagem mais recente e recr
 - **Faz backup do Grafana** (`/data/otel-lgtm/grafana` → `/data/otel-lgtm/grafana.bak`) quando a versão da imagem muda. O Grafana novo migra o banco e não volta para a versão antiga sem essa cópia.
 - **Espera até 5 min a stack ficar `healthy`.** Se não ficar, mostra o erro, sai com código 1 e imprime os comandos para voltar à versão anterior.
 
-Rode direto da internet (não precisa clonar nada, nem ocupa disco):
+### Passo a passo
+
+> 💡 Se tiver um ambiente de stage, atualize ele primeiro.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+# 1. Conferir o setup atual
+grep -n '/data' /opt/otel-lgtm/compose.yaml     # esperado: /data/otel-lgtm:/data
+docker ps --format '{{.Names}} | {{.Image}}'    # esperado: otel-lgtm | grafana/otel-lgtm:latest
+
+# 2. Baixar a versão mais recente do script
+curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh -o /tmp/update-lgtm.sh
+
+# 3. Rodar
+bash /tmp/update-lgtm.sh
 ```
 
-Ou, se já instalou antes, uma cópia fica salva no servidor:
+- **Passo 1:** o script sempre usa `/data/otel-lgtm` para os dados e o container `otel-lgtm`. Se algum dos dois for diferente no servidor, não rode: o stack subiria com uma pasta vazia, ou o container antigo continuaria segurando as portas.
+- **Passo 2:** baixe sempre do GitHub. A cópia em `/opt/otel-lgtm/update-lgtm.sh` é a da última atualização e pode estar desatualizada. Rodando a partir de um arquivo, o script também atualiza essa cópia.
 
-```bash
-bash /opt/otel-lgtm/update-lgtm.sh
-```
+**O que esperar na saída:**
+
+| Linha | Significado |
+|-------|-------------|
+| `Swap enabled` / `Swap already active` | Swap criada agora / já existia |
+| `New image version: backing up Grafana data...` | Só aparece quando há versão nova da imagem |
+| `Waiting for the stack to become healthy` | Leva de 1 a 3 minutos |
+| `Update complete!` | Deu certo |
+
+Depois de uma versão nova, o Grafana ainda atualiza plugins em segundo plano por 2–3 minutos. Alguns painéis podem dar erro nesse intervalo.
+
+**Se aparecer `ERROR`:** o script mostra a causa (trecho do log) e, se a versão tiver mudado, os comandos para voltar à anterior. O rollback restaura o Grafana a partir do `grafana.bak`, então dashboards criados depois do update se perdem.
+
+> ℹ️ Também dá para rodar direto da internet, sem gravar nada em disco (útil com o disco 100% cheio). Nesse modo o script não consegue atualizar a cópia em `/opt/otel-lgtm`.
+>
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/danilobreda/lgtm-easy-setup/main/update-lgtm.sh | bash
+> ```
 
 ### Disco cheio? Diagnóstico rápido
 
